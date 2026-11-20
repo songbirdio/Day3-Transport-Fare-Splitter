@@ -1,0 +1,1947 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta name="theme-color" content="#1e90ff" />
+    <title>FairSplit: split any amount, fairly</title>
+
+    <!-- =====================================================
+       CSS: Sleek, Modern Glassmorphism UI
+       ===================================================== -->
+    <style>
+      :root {
+        --navy: #0b2a5b;
+        --navy-2: #123b7a;
+        --blue: #0e2b49;
+        --blue-2: #003b6c;
+        --blue-3: #364a58;
+        --blue-deep: #0b6fe0;
+        --blue-soft: #e8f4ff;
+        --white: #ffffff;
+        --muted: #4a689a;
+        --line: #cfe3fb;
+        --glass: rgba(255, 255, 255, 0.7);
+        --shadow: 0 10px 40px rgba(11, 42, 91, 0.08);
+        --radius: 24px;
+      }
+      * {
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+      }
+      html {
+        scroll-behavior: smooth;
+        background: #373c43;
+      }
+      body {
+        margin: 0;
+        font-family:
+          system-ui,
+          -apple-system,
+          "Segoe UI",
+          Roboto,
+          Arial,
+          sans-serif;
+        background: transparent;
+        color: var(--navy);
+        padding-bottom: 96px;
+        min-height: 100vh;
+      }
+
+      /* ---------- Background Image ---------- */
+      body::before {
+        content: "";
+        position: fixed;
+        inset: 0;
+        z-index: -1;
+        background-image:
+          linear-gradient(
+            160deg,
+            rgba(34, 45, 57, 0.85),
+            rgba(83, 91, 99, 0.75)
+          ),
+          url("https://images.unsplash.com/photo-1521791136064-7986c2920216?auto=format&fit=crop&w=1920&q=80");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        animation: bgFade 1.2s ease both;
+      }
+
+      .wrap {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 24px;
+      }
+
+      /* ---------- Header ---------- */
+      header {
+        background: linear-gradient(
+          135deg,
+          rgba(4, 15, 27, 0.9),
+          rgba(59, 149, 212, 0.85)
+        );
+        -webkit-backdrop-filter: blur(16px);
+        backdrop-filter: blur(16px);
+        color: var(--white);
+        padding: 24px 0 30px;
+        border-radius: 0 0 32px 32px;
+        box-shadow: 0 12px 32px rgba(11, 42, 91, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+      }
+      .logo {
+        width: 72px;
+        height: 72px;
+        border-radius: 22px;
+        background: var(--white);
+        color: var(--blue);
+        display: grid;
+        place-items: center;
+        font-size: 2.8rem;
+        font-weight: 800;
+        line-height: 1;
+        box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+        animation: logoPop 0.6s cubic-bezier(0.2, 1.4, 0.4, 1) both;
+      }
+      .brand h1 {
+        margin: 0;
+        font-size: 2.5rem;
+        letter-spacing: -0.03em;
+      }
+      .brand p {
+        margin: 4px 0 0;
+        font-size: 0.45rem;
+        color: rgba(255, 255, 255, 0.85);
+        letter-spacing: 0.02em;
+      }
+
+      /* ---------- Presets (Sleek New Design) ---------- */
+      .presets {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        margin: 24px 0 12px;
+        padding: 2px 2px 8px;
+        scrollbar-width: none;
+      }
+      .presets::-webkit-scrollbar {
+        display: none;
+      }
+      .preset {
+        flex: none;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(10, 25, 50, 0.4);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        color: rgba(255, 255, 255, 0.6);
+        padding: 12px 20px;
+        border-radius: 14px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.2, 1.3, 0.4, 1);
+      }
+      .preset:hover {
+        background: rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.9);
+        transform: translateY(-2px);
+      }
+      .preset:active {
+        transform: scale(0.95);
+      }
+      .preset.active {
+        background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+        border-color: transparent;
+        color: #ffffff;
+        box-shadow: 0 8px 24px rgba(0, 210, 255, 0.4);
+      }
+
+      /* ---------- Layout ---------- */
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 24px;
+        margin-top: 16px;
+      }
+      .card {
+        background: var(--glass);
+        -webkit-backdrop-filter: blur(20px);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        border-radius: var(--radius);
+        padding: 28px;
+        box-shadow: var(--shadow);
+        animation: rise 0.5s ease both;
+      }
+      .card:nth-child(2) {
+        animation-delay: 0.06s;
+      }
+      .card:nth-child(3) {
+        animation-delay: 0.12s;
+      }
+      .card:nth-child(4) {
+        animation-delay: 0.18s;
+      }
+      .card + .card {
+        margin-top: 24px;
+      }
+      .card h2 {
+        margin: 0 0 16px;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      @media (min-width: 880px) {
+        .grid {
+          grid-template-columns: 1.1fr 0.9fr;
+          align-items: start;
+        }
+        .result-col {
+          position: sticky;
+          top: 24px;
+        }
+        .sticky-bar {
+          display: none !important;
+        }
+        body {
+          padding-bottom: 40px;
+        }
+      }
+
+      /* ---------- Amount Input ---------- */
+      .money {
+        position: relative;
+      }
+      .money span {
+        position: absolute;
+        left: 20px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1.8rem;
+        font-weight: 800;
+        color: var(--blue);
+      }
+      .money input {
+        width: 100%;
+        height: 80px;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        padding: 0 20px 0 56px;
+        font-size: 2.2rem;
+        font-weight: 800;
+        color: var(--navy);
+        background: var(--white);
+        letter-spacing: -0.02em;
+        box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.02);
+        transition: all 0.2s;
+      }
+      .money input:focus,
+      .num:focus,
+      .pname:focus,
+      .pw:focus,
+      .tipbox:focus,
+      .select:focus {
+        outline: none;
+        border-color: var(--blue-deep);
+        box-shadow: 0 0 0 4px rgba(11, 111, 224, 0.15);
+      }
+      .words {
+        margin-top: 10px;
+        font-size: 0.85rem;
+        color: var(--muted);
+        min-height: 1.2em;
+      }
+
+      /* ---------- SLEEK SEGMENTED CONTROL ---------- */
+      .seg {
+        position: relative;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        background: rgba(10, 25, 50, 0.6);
+        border-radius: 16px;
+        padding: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        -webkit-backdrop-filter: blur(12px);
+        backdrop-filter: blur(12px);
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+      }
+      .seg .ind {
+        position: absolute;
+        top: 6px;
+        bottom: 6px;
+        left: 6px;
+        width: calc(50% - 6px);
+        background: linear-gradient(90deg, #00d2ff 0%, #3a7bd5 100%);
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 210, 255, 0.4);
+        transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+      .seg[data-mode="shares"] .ind {
+        transform: translateX(100%);
+      }
+      .seg button {
+        position: relative;
+        z-index: 1;
+        height: 48px;
+        border: none;
+        background: none;
+        font-size: 1rem;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.5);
+        cursor: pointer;
+        transition: color 0.3s ease;
+      }
+      .seg button.on {
+        color: #ffffff;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      }
+
+      /* ---------- People Stepper ---------- */
+      .stepper {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 20px;
+      }
+      .stepper label {
+        font-weight: 700;
+      }
+      .stepper small {
+        display: block;
+        color: var(--muted);
+        font-weight: 400;
+        margin-top: 4px;
+      }
+      .step-controls {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .round-btn {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        border: 1px solid var(--line);
+        background: var(--white);
+        color: var(--blue);
+        font-size: 1.6rem;
+        font-weight: 700;
+        cursor: pointer;
+        line-height: 1;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+        transition: all 0.2s cubic-bezier(0.2, 1.4, 0.4, 1);
+      }
+      .round-btn:hover {
+        background: var(--blue-soft);
+        border-color: var(--blue-deep);
+      }
+      .round-btn:active {
+        transform: scale(0.88);
+        background: var(--blue-deep);
+        color: var(--white);
+      }
+      .num {
+        width: 80px;
+        height: 52px;
+        text-align: center;
+        font-size: 1.5rem;
+        font-weight: 800;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        background: var(--white);
+        color: var(--navy);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+      }
+
+      /* ---------- Partner rows ---------- */
+      .bar {
+        display: flex;
+        height: 16px;
+        border-radius: 99px;
+        overflow: hidden;
+        background: var(--blue-soft);
+        margin: 20px 0 10px;
+      }
+      .bar div {
+        height: 100%;
+        transition: width 0.35s;
+      }
+      .prow {
+        display: grid;
+        grid-template-columns: 16px 1fr 80px auto 34px;
+        gap: 12px;
+        align-items: center;
+        margin-top: 12px;
+        animation: pop 0.25s;
+      }
+      .dot {
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+      }
+      .pname,
+      .pw {
+        height: 48px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 0 12px;
+        font-size: 0.95rem;
+        min-width: 0;
+        background: var(--white);
+        color: var(--navy);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+      }
+      .pw {
+        text-align: center;
+        font-weight: 700;
+      }
+      .pamt {
+        font-weight: 800;
+        text-align: right;
+        font-size: 1rem;
+        min-width: 90px;
+        color: var(--navy);
+      }
+      .pamt small {
+        display: block;
+        font-weight: 500;
+        color: var(--muted);
+        font-size: 0.75rem;
+      }
+      .pdel {
+        border: none;
+        background: rgba(255, 255, 255, 0.5);
+        color: var(--muted);
+        font-size: 1.1rem;
+        cursor: pointer;
+        border-radius: 10px;
+        height: 34px;
+        transition: all 0.2s;
+      }
+      .pdel:hover {
+        color: var(--white);
+        background: var(--blue-deep);
+      }
+      .pdel:active {
+        transform: scale(0.85);
+      }
+
+      .prow-head {
+        display: grid;
+        grid-template-columns: 16px 1fr 80px auto 34px;
+        gap: 12px;
+        font-size: 0.75rem;
+        color: var(--muted);
+        margin-top: 8px;
+      }
+      .prow-head span:nth-child(3) {
+        text-align: center;
+      }
+      .prow-head span:nth-child(4) {
+        text-align: right;
+        min-width: 90px;
+      }
+
+      .row-actions {
+        display: flex;
+        gap: 10px;
+        margin-top: 18px;
+        flex-wrap: wrap;
+      }
+      .ghost {
+        border: 1px dashed var(--blue-deep);
+        background: rgba(232, 244, 255, 0.5);
+        color: var(--navy);
+        font-weight: 700;
+        border-radius: 14px;
+        height: 46px;
+        padding: 0 20px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+      }
+      .ghost:hover {
+        background: #d8ecff;
+      }
+      .ghost:active {
+        transform: scale(0.95);
+      }
+      .ghost.plain {
+        border: 1px solid var(--line);
+        background: var(--white);
+        color: var(--muted);
+      }
+      .note {
+        font-size: 0.85rem;
+        color: var(--muted);
+        margin-top: 12px;
+        line-height: 1.5;
+      }
+      .note.warn {
+        color: var(--navy);
+        background: var(--blue-soft);
+        border-radius: 12px;
+        padding: 10px 14px;
+      }
+
+      /* ---------- Option chips ---------- */
+      .opt-label {
+        font-weight: 700;
+        margin: 0 0 10px;
+        font-size: 0.95rem;
+        color: var(--navy);
+      }
+      .opt-label small {
+        font-weight: 400;
+        color: var(--muted);
+      }
+      .chips {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+      .chip {
+        height: 46px;
+        padding: 0 20px;
+        border-radius: 14px;
+        border: 1px solid var(--line);
+        background: var(--white);
+        font-weight: 700;
+        font-size: 0.9rem;
+        color: var(--navy);
+        cursor: pointer;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.02);
+        transition:
+          transform 0.15s cubic-bezier(0.2, 1.4, 0.4, 1),
+          background 0.2s,
+          color 0.2s,
+          border-color 0.2s,
+          box-shadow 0.2s;
+      }
+      .chip:hover {
+        border-color: var(--blue-deep);
+        background: var(--blue-soft);
+      }
+      .chip:active {
+        transform: scale(0.92);
+      }
+      .chip.on {
+        background: var(--blue-deep);
+        border-color: var(--blue-deep);
+        color: var(--white);
+        box-shadow: 0 6px 16px rgba(11, 111, 224, 0.35);
+      }
+      .tipbox {
+        width: 100px;
+        height: 46px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 0 12px;
+        font-size: 0.9rem;
+        font-weight: 700;
+        text-align: center;
+        background: var(--white);
+        color: var(--navy);
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+      }
+      .tipbox:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      .select {
+        width: 100%;
+        height: 48px;
+        border: 1px solid var(--line);
+        border-radius: 14px;
+        padding: 0 14px;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: var(--navy);
+        background: var(--white);
+        cursor: pointer;
+        box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+      }
+      .opt + .opt {
+        margin-top: 24px;
+      }
+
+      /* ---------- Result card ---------- */
+      .hero {
+        background: linear-gradient(145deg, var(--blue), var(--blue-deep));
+        color: var(--white);
+        border-radius: 28px;
+        padding: 28px;
+        box-shadow: 0 16px 40px rgba(11, 111, 224, 0.35);
+        position: relative;
+        overflow: hidden;
+        animation: rise 0.5s ease both;
+      }
+      .hero::after {
+        content: "";
+        position: absolute;
+        right: -60px;
+        top: -60px;
+        width: 200px;
+        height: 200px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.12);
+        animation: floaty 7s ease-in-out infinite;
+      }
+      .hero .tag {
+        font-size: 0.85rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: #a5d8ff;
+        font-weight: 700;
+        position: relative;
+        z-index: 1;
+      }
+      .hero .big {
+        font-size: 3rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+        margin: 8px 0 6px;
+        position: relative;
+        z-index: 1;
+        word-break: break-word;
+      }
+      .hero .sub {
+        color: #dcf0ff;
+        font-size: 0.95rem;
+        position: relative;
+        z-index: 1;
+        line-height: 1.5;
+      }
+      .details {
+        margin-top: 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 16px;
+        padding: 8px 18px;
+        position: relative;
+        z-index: 1;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .drow {
+        display: flex;
+        justify-content: space-between;
+        padding: 12px 0;
+        font-size: 0.95rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+      }
+      .drow:last-child {
+        border-bottom: none;
+      }
+      .drow span:first-child {
+        color: #dcf0ff;
+      }
+      .drow b {
+        font-weight: 700;
+      }
+      .drow.key b {
+        color: #ffffff;
+        background: rgba(255, 255, 255, 0.2);
+        padding: 2px 10px;
+        border-radius: 8px;
+      }
+
+      .actions {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 12px;
+        margin-top: 20px;
+      }
+      .btn {
+        height: 52px;
+        border-radius: 16px;
+        border: 1px solid var(--line);
+        background: var(--white);
+        color: var(--blue-deep);
+        font-weight: 700;
+        font-size: 0.95rem;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+        transition: all 0.2s cubic-bezier(0.2, 1.4, 0.4, 1);
+      }
+      .btn:hover {
+        background: var(--blue-soft);
+        border-color: var(--blue-deep);
+      }
+      .btn:active {
+        transform: scale(0.96);
+      }
+      .btn.solid {
+        background: var(--blue-deep);
+        border-color: var(--blue-deep);
+        color: var(--white);
+        box-shadow: 0 8px 20px rgba(11, 111, 224, 0.3);
+      }
+      .btn.solid:hover {
+        background: #095bb8;
+      }
+      .btn.dark {
+        background: var(--navy);
+        border-color: var(--navy);
+        color: var(--white);
+      }
+      .btn.dark:hover {
+        background: var(--navy-2);
+      }
+
+      /* ---------- History ---------- */
+      .hrow {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 14px 0;
+        border-bottom: 1px solid var(--line);
+        animation: pop 0.25s;
+      }
+      .hrow:last-child {
+        border-bottom: none;
+      }
+      .hrow small {
+        display: block;
+        color: var(--muted);
+        margin-top: 4px;
+      }
+      .hrow .hb {
+        display: flex;
+        gap: 8px;
+      }
+      .mini {
+        border: 1px solid var(--line);
+        background: var(--white);
+        border-radius: 10px;
+        height: 38px;
+        padding: 0 14px;
+        font-weight: 700;
+        color: var(--blue-deep);
+        cursor: pointer;
+        font-size: 0.85rem;
+        transition: all 0.2s;
+      }
+      .mini:hover {
+        background: var(--blue-deep);
+        border-color: var(--blue-deep);
+        color: var(--white);
+      }
+      .mini:active {
+        transform: scale(0.9);
+      }
+      .empty-h {
+        color: var(--muted);
+        font-size: 0.9rem;
+      }
+
+      /* ---------- Mobile sticky result bar ---------- */
+      .sticky-bar {
+        position: fixed;
+        left: 24px;
+        right: 24px;
+        bottom: calc(16px + env(safe-area-inset-bottom));
+        z-index: 10;
+        background: linear-gradient(135deg, var(--blue-deep), var(--navy));
+        color: var(--white);
+        border-radius: 20px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        box-shadow: 0 16px 40px rgba(11, 42, 91, 0.4);
+        transition: all 0.3s cubic-bezier(0.2, 1.4, 0.4, 1);
+        cursor: pointer;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+      }
+      .sticky-bar.hide {
+        transform: translateY(150%);
+        opacity: 0;
+        pointer-events: none;
+      }
+      .sticky-bar small {
+        display: block;
+        color: #a5d8ff;
+        font-weight: 700;
+        font-size: 0.75rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        margin-bottom: 2px;
+      }
+      .sticky-bar b {
+        font-size: 1.5rem;
+      }
+      .sticky-bar span {
+        color: #a5d8ff;
+        font-weight: 700;
+        font-size: 0.85rem;
+      }
+
+      /* ---------- Toast ---------- */
+      .toast {
+        position: fixed;
+        left: 50%;
+        top: 24px;
+        transform: translate(-50%, -100px);
+        background: var(--navy);
+        color: var(--white);
+        padding: 14px 22px;
+        border-radius: 16px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        z-index: 30;
+        transition: transform 0.3s cubic-bezier(0.2, 1.3, 0.4, 1);
+        max-width: 90vw;
+        box-shadow: 0 16px 40px rgba(11, 42, 91, 0.3);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+      }
+      .toast.show {
+        transform: translate(-50%, 0);
+      }
+
+      /* ---------- Animations ---------- */
+      @keyframes rise {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes pop {
+        from {
+          opacity: 0;
+          transform: scale(0.96);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes logoPop {
+        from {
+          opacity: 0;
+          transform: scale(0.6) rotate(-12deg);
+        }
+        to {
+          opacity: 1;
+          transform: none;
+        }
+      }
+      @keyframes bgFade {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes floaty {
+        0%,
+        100% {
+          transform: translate(0, 0);
+        }
+        50% {
+          transform: translate(-16px, 16px);
+        }
+      }
+      @keyframes bump {
+        0% {
+          transform: scale(1);
+        }
+        40% {
+          transform: scale(1.06);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+      @keyframes rip {
+        to {
+          transform: scale(2.6);
+          opacity: 0;
+        }
+      }
+      .bump {
+        animation: bump 0.45s ease;
+      }
+
+      .rip {
+        position: absolute;
+        border-radius: 50%;
+        transform: scale(0);
+        background: currentColor;
+        opacity: 0.35;
+        pointer-events: none;
+        animation: rip 0.55s ease-out forwards;
+      }
+
+      @media (max-width: 420px) {
+        .hero .big {
+          font-size: 2.4rem;
+        }
+        .prow,
+        .prow-head {
+          grid-template-columns: 14px 1fr 66px auto 30px;
+          gap: 8px;
+        }
+      }
+
+      /* ---------- Print ---------- */
+      @media print {
+        body::before,
+        header,
+        .presets,
+        .sticky-bar,
+        .actions,
+        .noprint,
+        .toast {
+          display: none !important;
+        }
+        body {
+          background: #fff;
+          padding: 0;
+        }
+        .grid {
+          display: block;
+        }
+        .card,
+        .hero {
+          box-shadow: none;
+          border: 1px solid #ccc;
+          margin-bottom: 16px;
+          animation: none;
+        }
+        .hero {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="wrap">
+        <div class="brand">
+          <div class="logo">÷</div>
+          <div>
+            <h1>FairSplit</h1>
+            <p>Split any amount between any number of people.</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <main class="wrap">
+      <div class="presets" id="presets"></div>
+
+      <div class="grid">
+        <!-- LEFT: inputs -->
+        <div>
+          <section class="card">
+            <h2 id="amountLabel">Total amount</h2>
+            <div class="money">
+              <span>₦</span
+              ><input
+                id="total"
+                type="number"
+                inputmode="decimal"
+                min="0"
+                step="any"
+                placeholder="0"
+              />
+            </div>
+            <div class="words" id="words"></div>
+          </section>
+
+          <section class="card">
+            <h2>How to split</h2>
+            <!-- SLEEK NEW TOGGLE -->
+            <div class="seg" id="seg" data-mode="equal">
+              <div class="ind"></div>
+              <button type="button" data-mode="equal" class="on">
+                Equal split
+              </button>
+              <button type="button" data-mode="shares">By shares</button>
+            </div>
+
+            <!-- Equal mode -->
+            <div id="equalBox">
+              <div class="stepper">
+                <label for="people"
+                  >Number of people<small>Including you</small></label
+                >
+                <div class="step-controls">
+                  <button
+                    class="round-btn"
+                    type="button"
+                    id="minus"
+                    aria-label="Fewer people"
+                  >
+                    −
+                  </button>
+                  <input
+                    class="num"
+                    id="people"
+                    type="number"
+                    inputmode="numeric"
+                    min="1"
+                    max="500"
+                    value="3"
+                  />
+                  <button
+                    class="round-btn"
+                    type="button"
+                    id="plus"
+                    aria-label="More people"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Shares mode -->
+            <div id="sharesBox" style="display: none">
+              <div class="bar" id="shareBar"></div>
+              <div class="prow-head">
+                <span></span><span>Name</span><span>Share</span><span>Gets</span
+                ><span></span>
+              </div>
+              <div id="partners"></div>
+              <div class="row-actions">
+                <button class="ghost" type="button" id="addPartner">
+                  + Add person
+                </button>
+                <button class="ghost plain" type="button" id="resetEqual">
+                  Make shares equal
+                </button>
+              </div>
+              <div class="note" id="shareNote">
+                Use percentages (60 and 40) or any numbers: 2 and 1 means the
+                first person gets double.
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="opt">
+              <p class="opt-label">
+                Add a tip or service charge <small>(optional)</small>
+              </p>
+              <div class="chips" id="tipChips">
+                <button class="chip on" type="button" data-tip="0">None</button>
+                <button class="chip" type="button" data-tip="5">5%</button>
+                <button class="chip" type="button" data-tip="10">10%</button>
+                <button class="chip" type="button" data-tip="15">15%</button>
+                <input
+                  class="tipbox"
+                  id="tipCustom"
+                  type="number"
+                  inputmode="decimal"
+                  min="0"
+                  step="any"
+                  placeholder="Other %"
+                />
+              </div>
+            </div>
+            <div class="opt">
+              <p class="opt-label">
+                Round up each share <small>so nobody needs change</small>
+              </p>
+              <div class="chips" id="stepChips">
+                <button class="chip on" type="button" data-step="0">
+                  Exact
+                </button>
+                <button class="chip" type="button" data-step="10">₦10</button>
+                <button class="chip" type="button" data-step="50">₦50</button>
+                <button class="chip" type="button" data-step="100">₦100</button>
+                <button class="chip" type="button" data-step="500">₦500</button>
+              </div>
+            </div>
+          </section>
+
+          <!-- Lion's share -->
+          <section class="card">
+            <div class="opt">
+              <p class="opt-label">
+                Lion's share <small>(one person takes a little less)</small>
+              </p>
+              <div class="chips" id="lionChips">
+                <button class="chip on" type="button" data-lion="0">Off</button>
+                <button class="chip" type="button" data-lion="1">On</button>
+                <input
+                  class="tipbox"
+                  id="lionPct"
+                  type="number"
+                  inputmode="decimal"
+                  min="0"
+                  max="90"
+                  step="any"
+                  value="5"
+                  placeholder="5%"
+                  disabled
+                />
+              </div>
+              <div id="lionPickWrap" style="display: none">
+                <p class="opt-label" style="margin: 18px 0 10px">
+                  Who pays less?
+                </p>
+                <select id="lionWho" class="select"></select>
+              </div>
+              <div class="note" id="lionNote">
+                Turn this on to take a small percentage off one person's share —
+                the rest is spread across everyone else.
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <!-- RIGHT: result -->
+        <div class="result-col" id="resultCol">
+          <div class="hero" id="hero">
+            <div class="tag" id="heroTag">Each person pays</div>
+            <div class="big" id="heroBig">₦0</div>
+            <div class="sub" id="heroSub">Enter an amount to begin.</div>
+            <div class="details" id="details"></div>
+          </div>
+
+          <div class="actions">
+            <button class="btn solid" type="button" id="whatsapp">
+              Share on WhatsApp
+            </button>
+            <button class="btn" type="button" id="copy">Copy summary</button>
+            <button class="btn dark" type="button" id="saveBtn">
+              Save this split
+            </button>
+            <button class="btn" type="button" id="print">Print / PDF</button>
+          </div>
+
+          <section class="card noprint" style="margin-top: 24px">
+            <h2>Saved splits</h2>
+            <div id="history"></div>
+          </section>
+        </div>
+      </div>
+    </main>
+
+    <!-- Mobile: result always visible at the bottom -->
+    <div class="sticky-bar hide" id="sticky">
+      <div><small id="stickyTag">Each pays</small><b id="stickyBig">₦0</b></div>
+      <span>See breakdown ↓</span>
+    </div>
+    <div class="toast" id="toast"></div>
+
+    <!-- =====================================================
+       JavaScript
+       ===================================================== -->
+    <script>
+      const $ = (id) => document.getElementById(id);
+
+      const PRESETS = [
+        { icon: "🧾", label: "Shared bill", mode: "equal" },
+        { icon: "🏠", label: "Rent / Utilities", mode: "equal" },
+        { icon: "💼", label: "Business profit", mode: "shares" },
+        { icon: "📈", label: "Investment returns", mode: "shares" },
+      ];
+
+      const COLORS = [
+        "#0b2a5b",
+        "#1e90ff",
+        "#3aa6ff",
+        "#63bdff",
+        "#123b7a",
+        "#0b6fe0",
+        "#8ed0ff",
+        "#2f7fd4",
+      ];
+
+      let state = {
+        label: "Shared bill",
+        mode: "equal",
+        total: "",
+        people: 3,
+        tip: 0,
+        step: 0,
+        lion: { on: false, pct: 5, who: 0 },
+        partners: [
+          { id: 1, name: "Partner 1", w: 50 },
+          { id: 2, name: "Partner 2", w: 50 },
+        ],
+      };
+      let history = [];
+
+      function loadAll() {
+        try {
+          const s = JSON.parse(localStorage.getItem("fs_state"));
+          if (s && s.partners) state = Object.assign(state, s);
+          history = JSON.parse(localStorage.getItem("fs_history")) || [];
+        } catch (e) {
+          history = [];
+        }
+        if (!state.lion) state.lion = { on: false, pct: 5, who: 0 };
+      }
+      function saveState() {
+        try {
+          localStorage.setItem("fs_state", JSON.stringify(state));
+        } catch (e) {}
+      }
+      function saveHistory() {
+        try {
+          localStorage.setItem("fs_history", JSON.stringify(history));
+        } catch (e) {}
+      }
+
+      const round2 = (n) => Math.round(n * 100) / 100;
+      const naira = (n) =>
+        "₦" + Number(n).toLocaleString("en-NG", { maximumFractionDigits: 2 });
+      const peopleCount = () =>
+        Math.max(1, Math.min(500, Math.floor(Number(state.people)) || 1));
+
+      function allocate(amount, weights) {
+        const kobo = Math.round(amount * 100);
+        const sum = weights.reduce((a, b) => a + b, 0);
+        if (sum <= 0) return weights.map(() => 0);
+        const raw = weights.map((w) => (kobo * w) / sum);
+        const base = raw.map(Math.floor);
+        let left = kobo - base.reduce((a, b) => a + b, 0);
+        raw
+          .map((r, i) => ({ i: i, frac: r - base[i] }))
+          .sort((a, b) => b.frac - a.frac)
+          .forEach((o) => {
+            if (left > 0) {
+              base[o.i] += 1;
+              left--;
+            }
+          });
+        return base.map((k) => k / 100);
+      }
+
+      function baseWeights() {
+        if (state.mode === "equal") return Array(peopleCount()).fill(1);
+        return state.partners.map((p) => Math.max(0, Number(p.w) || 0));
+      }
+
+      function personName(i) {
+        if (state.mode === "equal") return "Person " + (i + 1);
+        const p = state.partners[i];
+        return (p && p.name) || "Person " + (i + 1);
+      }
+
+      function countUp(el, to) {
+        const from = el._v || 0;
+        if (Math.abs(to - from) > 0.004) {
+          el.classList.remove("bump");
+          void el.offsetWidth;
+          el.classList.add("bump");
+        }
+        const start = performance.now(),
+          dur = 450;
+        el._v = to;
+        function stepFn(now) {
+          const p = Math.min(1, (now - start) / dur);
+          const v = from + (to - from) * (1 - Math.pow(1 - p, 3));
+          el.textContent = naira(round2(v));
+          if (p < 1) requestAnimationFrame(stepFn);
+          else el.textContent = naira(to);
+        }
+        requestAnimationFrame(stepFn);
+      }
+
+      let toastTimer;
+      function toast(msg) {
+        const t = $("toast");
+        t.textContent = msg;
+        t.classList.add("show");
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+      }
+
+      function compute() {
+        const total = Number(state.total) || 0;
+        const tipAmt = round2((total * (Number(state.tip) || 0)) / 100);
+        const grand = round2(total + tipAmt);
+
+        const plainWeights = baseWeights();
+        const plainShares = allocate(grand, plainWeights.slice());
+
+        const weights = baseWeights();
+
+        let lionIdx = -1;
+        let lionSaving = 0;
+        if (state.lion.on && weights.length > 1) {
+          lionIdx = Math.min(
+            Math.max(0, Math.floor(Number(state.lion.who) || 0)),
+            weights.length - 1,
+          );
+          const pct = Math.min(90, Math.max(0, Number(state.lion.pct) || 0));
+          weights[lionIdx] = weights[lionIdx] * (1 - pct / 100);
+        }
+
+        const exact = allocate(grand, weights);
+        const step = Number(state.step) || 0;
+        const shares =
+          step > 0
+            ? exact.map((x) => Math.ceil(x / step - 1e-9) * step)
+            : exact;
+        const collected = round2(shares.reduce((a, b) => a + b, 0));
+        const surplus = round2(collected - grand);
+        const wSum = weights.reduce((a, b) => a + b, 0);
+
+        if (lionIdx > -1) {
+          lionSaving = round2(plainShares[lionIdx] - exact[lionIdx]);
+        }
+
+        return {
+          total,
+          tipAmt,
+          grand,
+          weights,
+          wSum,
+          shares,
+          collected,
+          surplus,
+          lionIdx,
+          lionSaving,
+        };
+      }
+
+      function update() {
+        const c = compute();
+        const hasAmount = c.total > 0;
+
+        if (state.mode === "equal") {
+          const n = peopleCount();
+          const groups = {};
+          c.shares.forEach((s) => {
+            groups[s] = (groups[s] || 0) + 1;
+          });
+          const list = Object.entries(groups)
+            .map(([v, count]) => ({ v: Number(v), count: count }))
+            .sort((a, b) => b.v - a.v);
+          $("heroTag").textContent = "Each person pays";
+          countUp($("heroBig"), list.length ? list[0].v : 0);
+          $("stickyTag").textContent = "Each pays";
+          countUp($("stickyBig"), list.length ? list[0].v : 0);
+          if (!hasAmount)
+            $("heroSub").textContent = "Enter an amount to begin.";
+          else if (list.length === 1)
+            $("heroSub").textContent =
+              n + (n === 1 ? " person" : " people") + " × " + naira(list[0].v);
+          else
+            $("heroSub").textContent = list
+              .map(
+                (g) =>
+                  g.count +
+                  (g.count === 1 ? " person pays " : " people pay ") +
+                  naira(g.v),
+              )
+              .join(" · ");
+        } else {
+          $("heroTag").textContent = "Total to share out";
+          countUp($("heroBig"), c.grand);
+          $("stickyTag").textContent = "Total to split";
+          countUp($("stickyBig"), c.grand);
+          const n = state.partners.length;
+          $("heroSub").textContent = hasAmount
+            ? "Between " +
+              n +
+              (n === 1 ? " person" : " people") +
+              ", in proportion to their shares."
+            : "Enter an amount to begin.";
+        }
+
+        const rows = [["Amount", naira(c.total)]];
+        if (c.tipAmt > 0)
+          rows.push([
+            "Tip / service (" + Number(state.tip) + "%)",
+            naira(c.tipAmt),
+          ]);
+        rows.push(["Total to split", naira(c.grand), "key"]);
+        if (c.lionSaving > 0)
+          rows.push([
+            "Lion's share · " +
+              personName(c.lionIdx) +
+              " (−" +
+              Number(state.lion.pct) +
+              "%)",
+            "−" + naira(c.lionSaving),
+            "key",
+          ]);
+        if (c.surplus !== 0) {
+          rows.push(["Collected after rounding", naira(c.collected)]);
+          rows.push([
+            c.surplus > 0 ? "Extra (keep as change)" : "Short by",
+            naira(Math.abs(c.surplus)),
+            "key",
+          ]);
+        }
+
+        $("details").innerHTML = rows
+          .map(
+            (r) =>
+              '<div class="drow ' +
+              (r[2] || "") +
+              '"><span>' +
+              r[0] +
+              "</span><b>" +
+              r[1] +
+              "</b></div>",
+          )
+          .join("");
+
+        $("words").textContent = hasAmount
+          ? naira(c.total) +
+            (c.tipAmt > 0
+              ? " + " + naira(c.tipAmt) + " tip = " + naira(c.grand)
+              : "")
+          : "";
+
+        if (state.mode === "shares") {
+          state.partners.forEach((p, i) => {
+            const row = document.querySelector('[data-id="' + p.id + '"]');
+            if (!row) return;
+            const pct = c.wSum > 0 ? (c.weights[i] / c.wSum) * 100 : 0;
+            row.querySelector(".pamt").innerHTML =
+              naira(c.shares[i]) + "<small>" + round2(pct) + "%</small>";
+          });
+          $("shareBar").innerHTML = state.partners
+            .map(
+              (p, i) =>
+                '<div style="width:' +
+                (c.wSum > 0 ? (c.weights[i] / c.wSum) * 100 : 0) +
+                "%;background:" +
+                COLORS[i % COLORS.length] +
+                '"></div>',
+            )
+            .join("");
+          const note = $("shareNote");
+          if (c.wSum === 0) {
+            note.className = "note warn";
+            note.textContent =
+              "Enter a share for each person to see the split.";
+          } else if (Math.abs(c.wSum - 100) > 0.001) {
+            note.className = "note warn";
+            note.textContent =
+              "Shares add up to " +
+              round2(c.wSum) +
+              ", not 100. That is fine: the money is still split in proportion.";
+          } else {
+            note.className = "note";
+            note.textContent =
+              "Use percentages (60 and 40) or any numbers: 2 and 1 means the first person gets double.";
+          }
+        }
+
+        renderLion();
+        const ln = $("lionNote");
+        if (state.lion.on && c.lionSaving > 0) {
+          ln.className = "note warn";
+          ln.textContent =
+            personName(c.lionIdx) +
+            " pays " +
+            naira(c.lionSaving) +
+            " less (" +
+            Number(state.lion.pct) +
+            "% off their share). The rest is shared out among everyone else.";
+        } else {
+          ln.className = "note";
+          ln.textContent =
+            "Turn this on to take a small percentage off one person's share — the rest is spread across everyone else.";
+        }
+
+        saveState();
+      }
+
+      function renderPresets() {
+        $("presets").innerHTML = PRESETS.map(
+          (p) =>
+            '<button type="button" class="preset ' +
+            (p.label === state.label ? "active" : "") +
+            '" data-label="' +
+            p.label +
+            '">' +
+            p.icon +
+            " " +
+            p.label +
+            "</button>",
+        ).join("");
+      }
+
+      function renderPartners() {
+        const box = $("partners");
+        box.innerHTML = "";
+        state.partners.forEach((p, i) => {
+          const row = document.createElement("div");
+          row.className = "prow";
+          row.dataset.id = p.id;
+
+          const dot = document.createElement("span");
+          dot.className = "dot";
+          dot.style.background = COLORS[i % COLORS.length];
+
+          const name = document.createElement("input");
+          name.className = "pname";
+          name.value = p.name;
+          name.maxLength = 30;
+          name.placeholder = "Name";
+
+          const w = document.createElement("input");
+          w.className = "pw";
+          w.type = "number";
+          w.inputMode = "decimal";
+          w.min = "0";
+          w.step = "any";
+          w.value = p.w;
+
+          const amt = document.createElement("div");
+          amt.className = "pamt";
+
+          const del = document.createElement("button");
+          del.className = "pdel";
+          del.type = "button";
+          del.textContent = "✕";
+
+          row.append(dot, name, w, amt, del);
+          box.appendChild(row);
+        });
+      }
+
+      let lionSig = "";
+      function renderLion() {
+        const names =
+          state.mode === "equal"
+            ? Array.from(
+                { length: peopleCount() },
+                (_, i) => "Person " + (i + 1),
+              )
+            : state.partners.map((p, i) => p.name || "Person " + (i + 1));
+
+        const sig = state.mode + "|" + names.join("\u0001");
+        const sel = $("lionWho");
+        if (sig !== lionSig) {
+          lionSig = sig;
+          sel.innerHTML = names
+            .map(
+              (n, i) =>
+                '<option value="' +
+                i +
+                '">' +
+                n.replace(/</g, "&lt;") +
+                "</option>",
+            )
+            .join("");
+        }
+
+        const cur = Math.min(
+          Math.max(0, Math.floor(Number(state.lion.who) || 0)),
+          Math.max(0, names.length - 1),
+        );
+        state.lion.who = cur;
+        sel.value = String(cur);
+
+        $("lionPct").disabled = !state.lion.on;
+        $("lionPickWrap").style.display = state.lion.on ? "" : "none";
+        document
+          .querySelectorAll("#lionChips .chip")
+          .forEach((b) =>
+            b.classList.toggle(
+              "on",
+              (b.dataset.lion === "1") === !!state.lion.on,
+            ),
+          );
+      }
+
+      function syncUI() {
+        $("total").value = state.total;
+        $("people").value = state.people;
+        $("seg").dataset.mode = state.mode;
+        document
+          .querySelectorAll("#seg button")
+          .forEach((b) =>
+            b.classList.toggle("on", b.dataset.mode === state.mode),
+          );
+        $("equalBox").style.display = state.mode === "equal" ? "" : "none";
+        $("sharesBox").style.display = state.mode === "shares" ? "" : "none";
+        $("amountLabel").textContent = state.label + " · total amount";
+        document
+          .querySelectorAll("#tipChips .chip")
+          .forEach((b) =>
+            b.classList.toggle(
+              "on",
+              Number(b.dataset.tip) === Number(state.tip),
+            ),
+          );
+        $("tipCustom").value = [0, 5, 10, 15].includes(Number(state.tip))
+          ? ""
+          : state.tip;
+        document
+          .querySelectorAll("#stepChips .chip")
+          .forEach((b) =>
+            b.classList.toggle(
+              "on",
+              Number(b.dataset.step) === Number(state.step),
+            ),
+          );
+        $("lionPct").value = state.lion.pct;
+        renderPresets();
+        renderPartners();
+        renderHistory();
+        update();
+      }
+
+      $("total").addEventListener("input", (e) => {
+        state.total = e.target.value;
+        update();
+      });
+
+      function setPeople(n) {
+        state.people = Math.max(1, Math.min(500, n));
+        $("people").value = state.people;
+        update();
+      }
+      $("plus").addEventListener("click", () => setPeople(peopleCount() + 1));
+      $("minus").addEventListener("click", () => setPeople(peopleCount() - 1));
+      $("people").addEventListener("input", (e) => {
+        state.people = e.target.value;
+        update();
+      });
+      $("people").addEventListener("blur", () => {
+        $("people").value = peopleCount();
+      });
+
+      $("seg").addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if (!b) return;
+        state.mode = b.dataset.mode;
+        syncUI();
+      });
+
+      $("presets").addEventListener("click", (e) => {
+        const b = e.target.closest(".preset");
+        if (!b) return;
+        const p = PRESETS.find((x) => x.label === b.dataset.label);
+        state.label = p.label;
+        state.mode = p.mode;
+        syncUI();
+      });
+
+      $("tipChips").addEventListener("click", (e) => {
+        const b = e.target.closest(".chip");
+        if (!b) return;
+        state.tip = Number(b.dataset.tip);
+        $("tipCustom").value = "";
+        document
+          .querySelectorAll("#tipChips .chip")
+          .forEach((x) => x.classList.toggle("on", x === b));
+        update();
+      });
+      $("tipCustom").addEventListener("input", (e) => {
+        state.tip = Math.max(0, Number(e.target.value) || 0);
+        document
+          .querySelectorAll("#tipChips .chip")
+          .forEach((x) => x.classList.remove("on"));
+        update();
+      });
+
+      $("stepChips").addEventListener("click", (e) => {
+        const b = e.target.closest(".chip");
+        if (!b) return;
+        state.step = Number(b.dataset.step);
+        document
+          .querySelectorAll("#stepChips .chip")
+          .forEach((x) => x.classList.toggle("on", x === b));
+        update();
+      });
+
+      $("lionChips").addEventListener("click", (e) => {
+        const b = e.target.closest(".chip");
+        if (!b) return;
+        state.lion.on = b.dataset.lion === "1";
+        renderLion();
+        update();
+      });
+      $("lionPct").addEventListener("input", (e) => {
+        state.lion.pct = Math.max(0, Math.min(90, Number(e.target.value) || 0));
+        update();
+      });
+      $("lionWho").addEventListener("change", (e) => {
+        state.lion.who = Math.max(0, Number(e.target.value) || 0);
+        update();
+      });
+
+      $("partners").addEventListener("input", (e) => {
+        const row = e.target.closest(".prow");
+        if (!row) return;
+        const p = state.partners.find((x) => String(x.id) === row.dataset.id);
+        if (e.target.classList.contains("pname")) p.name = e.target.value;
+        if (e.target.classList.contains("pw")) p.w = e.target.value;
+        update();
+      });
+      $("partners").addEventListener("click", (e) => {
+        if (!e.target.classList.contains("pdel")) return;
+        if (state.partners.length <= 1) {
+          toast("Keep at least one person");
+          return;
+        }
+        const id = e.target.closest(".prow").dataset.id;
+        state.partners = state.partners.filter((x) => String(x.id) !== id);
+        renderPartners();
+        update();
+      });
+      $("addPartner").addEventListener("click", () => {
+        if (state.partners.length >= 20) {
+          toast("Maximum of 20 people");
+          return;
+        }
+        const avg =
+          state.partners.reduce((a, p) => a + (Number(p.w) || 0), 0) /
+          state.partners.length;
+        state.partners.push({
+          id: Date.now(),
+          name: "Partner " + (state.partners.length + 1),
+          w: round2(avg) || 10,
+        });
+        renderPartners();
+        update();
+      });
+      $("resetEqual").addEventListener("click", () => {
+        const each = round2(100 / state.partners.length);
+        state.partners.forEach((p) => {
+          p.w = each;
+        });
+        renderPartners();
+        update();
+      });
+
+      function summaryText() {
+        const c = compute();
+        const date = new Date().toLocaleDateString("en-GB", {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+        });
+        const lines = ["*FairSplit: " + state.label + "*", date, ""];
+        lines.push("Amount: " + naira(c.total));
+        if (c.tipAmt > 0)
+          lines.push("Tip (" + Number(state.tip) + "%): " + naira(c.tipAmt));
+        lines.push("Total to split: " + naira(c.grand), "");
+        if (state.mode === "equal") {
+          const n = peopleCount();
+          const groups = {};
+          c.shares.forEach((s) => {
+            groups[s] = (groups[s] || 0) + 1;
+          });
+          Object.entries(groups)
+            .sort((a, b) => b[0] - a[0])
+            .forEach(([v, count]) =>
+              lines.push(
+                count +
+                  (count === 1 ? " person" : " people") +
+                  " pay " +
+                  naira(Number(v)) +
+                  (n > 1 ? " each" : ""),
+              ),
+            );
+        } else {
+          state.partners.forEach((p, i) => {
+            const pct = c.wSum > 0 ? round2((c.weights[i] / c.wSum) * 100) : 0;
+            lines.push(
+              (p.name || "Person " + (i + 1)) +
+                ": " +
+                naira(c.shares[i]) +
+                " (" +
+                pct +
+                "%)",
+            );
+          });
+        }
+        if (c.lionSaving > 0)
+          lines.push(
+            "",
+            "Lion's share: " +
+              personName(c.lionIdx) +
+              " pays " +
+              naira(c.lionSaving) +
+              " less",
+          );
+        if (c.surplus > 0)
+          lines.push("", "Extra from rounding: " + naira(c.surplus));
+        return lines.join("\n");
+      }
+
+      $("whatsapp").addEventListener("click", () => {
+        if (!(Number(state.total) > 0)) {
+          toast("Enter an amount first");
+          return;
+        }
+        window.open(
+          "https://wa.me/?text=" + encodeURIComponent(summaryText()),
+          "_blank",
+        );
+      });
+
+      $("copy").addEventListener("click", async () => {
+        if (!(Number(state.total) > 0)) {
+          toast("Enter an amount first");
+          return;
+        }
+        const text = summaryText().replace(/\*/g, "");
+        try {
+          await navigator.clipboard.writeText(text);
+          toast("Summary copied ✓");
+        } catch (e) {
+          const ta = document.createElement("textarea");
+          ta.value = text;
+          document.body.appendChild(ta);
+          ta.select();
+          try {
+            document.execCommand("copy");
+            toast("Summary copied ✓");
+          } catch (err) {
+            toast("Could not copy");
+          }
+          ta.remove();
+        }
+      });
+
+      $("print").addEventListener("click", () => window.print());
+
+      function renderHistory() {
+        const box = $("history");
+        if (!history.length) {
+          box.innerHTML =
+            '<div class="empty-h">Nothing saved yet. Tap "Save this split" to keep a record.</div>';
+          return;
+        }
+        box.innerHTML = "";
+        history.forEach((h) => {
+          const row = document.createElement("div");
+          row.className = "hrow";
+          const info = document.createElement("div");
+          const t = document.createElement("b");
+          t.textContent = h.label + " · " + naira(h.grand);
+          const s = document.createElement("small");
+          s.textContent =
+            new Date(h.ts).toLocaleDateString("en-GB", {
+              day: "numeric",
+              month: "short",
+            }) +
+            " · " +
+            (h.snap.mode === "equal"
+              ? h.snap.people + " people"
+              : h.snap.partners.length + " partners");
+          info.append(t, s);
+          const b = document.createElement("div");
+          b.className = "hb";
+          const open = document.createElement("button");
+          open.className = "mini";
+          open.textContent = "Open";
+          open.dataset.open = h.id;
+          const del = document.createElement("button");
+          del.className = "mini";
+          del.textContent = "✕";
+          del.dataset.del = h.id;
+          b.append(open, del);
+          row.append(info, b);
+          box.appendChild(row);
+        });
+      }
+
+      $("saveBtn").addEventListener("click", () => {
+        const c = compute();
+        if (!(c.total > 0)) {
+          toast("Enter an amount first");
+          return;
+        }
+        history.unshift({
+          id: Date.now(),
+          ts: Date.now(),
+          label: state.label,
+          grand: c.grand,
+          snap: JSON.parse(JSON.stringify(state)),
+        });
+        history = history.slice(0, 10);
+        saveHistory();
+        renderHistory();
+        toast("Saved ✓");
+      });
+
+      $("history").addEventListener("click", (e) => {
+        const b = e.target.closest("button");
+        if (!b) return;
+        if (b.dataset.open) {
+          const h = history.find((x) => String(x.id) === b.dataset.open);
+          if (h) {
+            state = JSON.parse(JSON.stringify(h.snap));
+            if (!state.lion) state.lion = { on: false, pct: 5, who: 0 };
+            syncUI();
+            window.scrollTo({ top: 0, behavior: "smooth" });
+            toast("Opened");
+          }
+        }
+        if (b.dataset.del) {
+          history = history.filter((x) => String(x.id) !== b.dataset.del);
+          saveHistory();
+          renderHistory();
+        }
+      });
+
+      const sticky = $("sticky");
+      let heroVisible = false;
+      function refreshSticky() {
+        sticky.classList.toggle(
+          "hide",
+          heroVisible || !(Number(state.total) > 0),
+        );
+      }
+      sticky.addEventListener("click", () =>
+        $("resultCol").scrollIntoView({ behavior: "smooth" }),
+      );
+      if ("IntersectionObserver" in window) {
+        new IntersectionObserver(
+          (entries) => {
+            heroVisible = entries[0].isIntersecting;
+            refreshSticky();
+          },
+          { threshold: 0.25 },
+        ).observe($("hero"));
+      }
+      $("total").addEventListener("input", refreshSticky);
+
+      document.addEventListener("pointerdown", (e) => {
+        const el = e.target.closest(
+          "button, .preset, .chip, .btn, .mini, .round-btn, .sticky-bar, .seg button",
+        );
+        if (!el) return;
+        const cs = getComputedStyle(el);
+        if (cs.position === "static") el.style.position = "relative";
+        if (cs.overflow === "visible") el.style.overflow = "hidden";
+        const r = el.getBoundingClientRect();
+        const size = Math.max(r.width, r.height);
+        const span = document.createElement("span");
+        span.className = "rip";
+        span.style.width = span.style.height = size + "px";
+        span.style.left = e.clientX - r.left - size / 2 + "px";
+        span.style.top = e.clientY - r.top - size / 2 + "px";
+        el.appendChild(span);
+        setTimeout(() => span.remove(), 600);
+      });
+
+      loadAll();
+      syncUI();
+    </script>
+  </body>
+</html>
